@@ -15,7 +15,6 @@ config:
   ranks:
     mvp:
       enabled: true
-      unmoveable: true
       permission: joinevents.rank.mvp
       messages:
         enabled: true
@@ -52,6 +51,7 @@ config:
       joinItems:
         compass_1:
           enabled: true
+          unmoveable: true
           material: "DIAMOND_SWORD"
           nameTag:
             nbtTagName: "customItem"
