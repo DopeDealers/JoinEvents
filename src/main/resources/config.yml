@@ -1,0 +1,74 @@
+############################
+#                          #
+#                          #
+#        JoinEvents        #
+#      by DopeDealers      #
+#                          #
+#                          #
+############################
+# Placeholder API support
+# HexColor support with default color coding options
+# Unlimited rank joins with support to enable to disable them without having to remove them
+# To color the bossbar check the link below out
+# https://hub.spigotmc.org/javadocs/spigot/org/bukkit/boss/BarColor.html
+config:
+  ranks:
+    mvp:
+      enabled: true
+      unmoveable: true
+      permission: joinevents.rank.mvp
+      messages:
+        enabled: true
+        join: "&7[&6&lMVP&7] &6%player_name% &7Has joined the server!"
+        quit: "&7[&6&lMVP&7] &6%player_name% &7Has left the server ):"
+      noise:
+        enabled: true
+        sound: "ENTITY_EXPERIENCE_ORB_PICKUP"
+        volume: 10
+        pitch: 1.5
+      fireworks:
+        enabled: true
+        flicker: false
+        trail: true
+        mainColor: 16777215
+        fadeColor: 16777215
+        type: "BALL"
+      joinBook:
+        enabled: true
+        title: Welcome to the server mvp
+        author: "Prisk"
+        pages:
+          - This is the join message for page 1
+          - this is second page
+          - third
+          - fourth
+      bossBar:
+        enabled: true
+        color: "WHITE"
+        style: "SOLID"
+        title: "Hello!"
+        time: 1
+        progress: 1.0
+      joinItems:
+        compass_1:
+          enabled: true
+          material: "DIAMOND_SWORD"
+          nameTag:
+            nbtTagName: "customItem"
+            nbtValue: "specialSword"
+          name: "&aCustom Sword"
+          lore:
+            - "&7This is a custom sword."
+          slot: 0
+          enchantments:
+            SHARPNESS: 5
+            UNBREAKING: 3
+          uses: 10
+          #unlimitedUses: true  # Set this to true for unlimited uses
+          cooldown:
+            time: "10s"
+            message: "Cooldown: %s"
+          commands:
+            right_click:
+              - "say Welcome, %player_name%, to the server!"
+              - "give %player_name% diamond 1"

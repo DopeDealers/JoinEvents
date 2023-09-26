@@ -1,0 +1,18 @@
+name: JoinEvents
+main: org.cyci.mc.joinevents.Registry
+version: '${project.version}'
+description: A plugin to do awesome effects and messages upon a player joining
+api-version: '1.20'
+depend: [PlaceholderAPI]
+
+commands:
+  je:
+    aliases: joinevents
+
+permissions:
+  joinevents.commands:
+    children:
+      main:
+        default: not op
+      reload:
+        default: op
