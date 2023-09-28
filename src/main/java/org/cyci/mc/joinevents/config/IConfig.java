@@ -21,6 +21,8 @@ import org.cyci.mc.joinevents.parsers.SoundParser;
 import org.cyci.mc.joinevents.utils.*;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -39,6 +41,21 @@ public class IConfig {
         this.configName = configName;
     }
 
+    public void setJoinItemEnabled(String rank, String itemName, boolean enabled) {
+        // Set the 'enabled' property for JoinItems in all ranks
+        ConfigurationSection ranksSection = file.getConfigurationSection("config.ranks");
+        if (ranksSection != null) {
+            String rankPath = "config.ranks." + rank + ".joinItems." + itemName + ".enabled";
+            file.set(rankPath, enabled);
+        }
+        try {
+            File configFile = new File(this.configName);
+
+            file.save(configFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     public String getString(String path) {
         return file.getString(path);
     }
@@ -47,6 +64,12 @@ public class IConfig {
         return file.getStringList(path);
     }
 
+
+    public List<String> getAllRanks() {
+        ConfigurationSection rankSection = file.getConfigurationSection("config.ranks");
+        assert rankSection != null;
+        return rankSection != null ? new ArrayList<>(rankSection.getKeys(false)) : new ArrayList<>();
+    }
     public boolean isRankEnabled(String rankId) {
         ConfigurationSection rankSection = file.getConfigurationSection("config.ranks." + rankId);
         return rankSection != null && rankSection.getBoolean(".enabled");

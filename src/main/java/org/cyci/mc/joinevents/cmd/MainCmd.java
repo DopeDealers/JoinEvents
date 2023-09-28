@@ -23,9 +23,10 @@ public class MainCmd extends CommandListener {
         if (!(sender instanceof Player)) return;
         String noArgs = PlaceholderAPI.setPlaceholders(((Player) sender).getPlayer(), Lang.NOT_ENOUGH_ARGS.getConfigValue(new String[]{"", Lang.PREFIX.getConfigValue(null)}));
         Player player = ((Player) sender).getPlayer();
-        if (args.length == 0) sender.sendMessage(C.c(noArgs));
-        else {
-            if (args[0].equals("reload")) {
+        if (args.length == 0) {
+            player.sendMessage(C.c("Hi im empty"));
+        }
+        else if (args[0].equals("reload")) {
                 assert player != null;
                 if (player.hasPermission("joinevents.commands.reload")) {
                     try {
@@ -36,7 +37,6 @@ public class MainCmd extends CommandListener {
                         sender.sendMessage(C.c(PlaceholderAPI.setPlaceholders(((Player) sender).getPlayer(), Lang.RELOAD.getConfigValue(new String[]{"", Lang.PREFIX.getConfigValue(null)}))));
                     }
                 }
-            }
         }
     }
 }

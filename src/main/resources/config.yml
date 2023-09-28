@@ -72,3 +72,5 @@ config:
             right_click:
               - "say Welcome, %player_name%, to the server!"
               - "give %player_name% diamond 1"
+            left_click:
+              - "give %player_name% gold_ingot 2"
