@@ -27,6 +27,7 @@ public class ConfigManager {
     }
 
 
+    // work on this more
     public static IConfig getConfig(String configName, FileConfiguration fileConfiguration) {
         if (cachedConfigs.containsKey(configName)) {
             return cachedConfigs.get(configName);
