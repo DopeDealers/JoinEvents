@@ -64,7 +64,7 @@ public class PlayerInteract implements Listener {
                                                 command = PlaceholderAPI.setPlaceholders(player, command);
                                                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
                                             }
-                                        } else {
+                                        } else if (commandsL != null && !commandsL.isEmpty() && e.getAction().isLeftClick()){
                                             for (String command : commandsL) {
                                                 command = PlaceholderAPI.setPlaceholders(player, command);
                                                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
