@@ -1,4 +1,4 @@
-package org.cyci.mc.joinevents.db;
+package org.cyci.mc.joinevents.manager;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.cyci.mc.joinevents.Registry;
