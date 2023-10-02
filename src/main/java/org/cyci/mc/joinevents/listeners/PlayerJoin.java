@@ -33,8 +33,18 @@ import java.util.List;
  */
 public class PlayerJoin  implements Listener {
 
-    IConfig config = ConfigManager.getConfig("config.yml",  Registry.instance.config.getConfig());
+    IConfig config = new ConfigManager(Registry.instance).getConfig("config.yml", Registry.instance.getConfig());
 
+    /**
+     * The rankJoins function is called when a player joins the server.
+     * It checks if the player has permission for any of the ranks, and if they do, it plays a sound, broadcasts a message to all players on the server (if there is one), shows them a boss bar (if there is one), gives them an item in their inventory (if there are any items specified) and shoots fireworks at their location.
+
+     *
+     * @param PlayerJoinEvent e Get the player who joined
+     *
+     * @return A list of strings
+     *
+     */
     @EventHandler(priority = EventPriority.HIGHEST)
     public void rankJoins(PlayerJoinEvent e) {
         Player player = e.getPlayer();
@@ -64,7 +74,7 @@ public class PlayerJoin  implements Listener {
                 }
 
                 for (String itemName : config.getJoinItemNames(rankId)) {
-                    ItemStack joinItem = config.parseJoinItem(rankId, itemName, player);
+                    ItemStack joinItem = config.parseJoinItem(rankId, itemName);
                     ConfigurationSection test = Registry.instance.config.getConfig().getConfigurationSection("config.ranks." + rankId + ".joinItems." + itemName);
                     if (joinItem != null && test != null) {
                         int slot = test.getInt("slot");

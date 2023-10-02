@@ -9,11 +9,14 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.cyci.mc.joinevents.Registry;
+import org.cyci.mc.joinevents.actions.HealAction;
+import org.cyci.mc.joinevents.actions.MessageAction;
 import org.cyci.mc.joinevents.manager.CooldownManager;
 import org.cyci.mc.joinevents.parsers.BossBarParser;
 import org.cyci.mc.joinevents.parsers.FireworkParser;
@@ -24,6 +27,8 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author - Phil
@@ -36,11 +41,34 @@ public class IConfig {
     private final FileConfiguration file;
     private final String configName;
 
+    /**
+     * The IConfig function is used to create a new config file.
+     *
+     *
+     * @param FileConfiguration file Get the file that you want to save/load from
+     * @param String configName Get the name of the config file
+     *
+     * @return The file and the configname
+     *
+     */
     public IConfig(FileConfiguration file, String configName) {
         this.file = file;
         this.configName = configName;
     }
 
+    /**
+     * The setJoinItemEnabled function sets the 'enabled' property for JoinItems in all ranks.
+     *
+     *
+     * @param String rank Specify which rank to set the join item for
+     * @param String itemName Specify which item to set the enabled property for
+     * @param boolean enabled Set the 'enabled' property of joinitems in all ranks
+    public void setjoinitemenabled(string itemname, boolean enabled) {
+
+     *
+     * @return A boolean, but i want it to return a string
+     *
+     */
     public void setJoinItemEnabled(String rank, String itemName, boolean enabled) {
         // Set the 'enabled' property for JoinItems in all ranks
         ConfigurationSection ranksSection = file.getConfigurationSection("config.ranks");
@@ -56,36 +84,101 @@ public class IConfig {
             e.printStackTrace();
         }
     }
+    /**
+     * The getFile function returns the file configuration of the config.yml file
+     *
+     *
+     *
+     * @return The file variable
+     *
+     */
+    public FileConfiguration getFile() {
+        return this.file;
+    }
     public String getString(String path) {
         return file.getString(path);
     }
 
+    /**
+     * The getStringList function is used to get a list of strings from the config.yml file.
+     *
+     *
+     * @param String path Specify the path to the desired list
+     *
+     * @return A list of strings
+     *
+     */
     public List<String> getStringList(String path) {
         return file.getStringList(path);
     }
 
 
+    /**
+     * The getAllRanks function returns a list of all the ranks in the config.yml file.
+     *
+     *
+     *
+     * @return A list of all the ranks in the config file
+     *
+     */
     public List<String> getAllRanks() {
         ConfigurationSection rankSection = file.getConfigurationSection("config.ranks");
         assert rankSection != null;
         return rankSection != null ? new ArrayList<>(rankSection.getKeys(false)) : new ArrayList<>();
     }
+    /**
+     * The isRankEnabled function checks if a rank is enabled.
+     *
+     *
+     * @param String rankId Get the rank section in the config
+     *
+     * @return A boolean value
+     *
+     */
     public boolean isRankEnabled(String rankId) {
         ConfigurationSection rankSection = file.getConfigurationSection("config.ranks." + rankId);
         return rankSection != null && rankSection.getBoolean(".enabled");
     }
 
+    /**
+     * The isSectionEnabled function checks if a section is enabled for a rank.
+     *
+     *
+     * @param String rankId Get the rank section in the config
+     * @param String section Get the section of the config
+     *
+     * @return The value of the ranksection and section
+     *
+     */
     public boolean isSectionEnabled(String rankId, String section) {
         ConfigurationSection rankSection = file.getConfigurationSection("config.ranks." + rankId);
         return rankSection != null && rankSection.getBoolean(section + ".enabled");
     }
 
+    /**
+     * The getJoinItemNames function returns a list of all the join items for a given rank.
+     *
+     *
+     * @param String rankId Get the rank from the config
+     *
+     * @return A list of keys from the joinitems section
+     *
+     */
     public List<String> getJoinItemNames(String rankId) {
         ConfigurationSection joinItemsSection = file.getConfigurationSection("config.ranks." + rankId + ".joinItems");
         assert joinItemsSection != null;
         return joinItemsSection != null ? new ArrayList<>(joinItemsSection.getKeys(false)) : new ArrayList<>();
     }
 
+    /**
+     * The getRankIdForPlayer function returns the rankId of a player.
+     *
+     *
+     * @param Player player Get the player's rank
+     *
+     * @return The rankid of the player
+     *
+     */
     public String getRankIdForPlayer(Player player) {
         for (String rankId : file.getConfigurationSection("config.ranks").getKeys(false)) {
             if (hasPermission(player, rankId)) {
@@ -95,6 +188,16 @@ public class IConfig {
         return null;
     }
 
+    /**
+     * The hasPermission function checks if a player has the permission to use a rank.
+     *
+     *
+     * @param Player player Check if the player has a permission
+     * @param String rankId Get the rank from the config
+     *
+     * @return A boolean value
+     *
+     */
     public boolean hasPermission(Player player, String rankId) {
         ConfigurationSection rankSection = file.getConfigurationSection("config.ranks." + rankId);
         if (rankSection != null) {
@@ -104,6 +207,18 @@ public class IConfig {
         return false;
     }
 
+    /**
+     * The parseMessage function is used to parse a message from the config.yml file
+     * and return it as a string. It takes in three parameters:
+     *
+     *
+     * @param Player player Get the player's name, uuid, and other information
+     * @param String rankId Get the rank section from the config
+     * @param String messageType Get the message from the config
+     *
+     * @return A string
+     *
+     */
     public String parseMessage(Player player, String rankId, String messageType) {
         ConfigurationSection rankSection = file.getConfigurationSection("config.ranks." + rankId);
         if (rankSection != null && isSectionEnabled(rankId, "messages")) {
@@ -116,6 +231,15 @@ public class IConfig {
         throw new IllegalStateException("No enabled rank found with a message.");
     }
 
+    /**
+     * The parseNoise function parses the noise section of a rank's configuration.
+     *
+     *
+     * @param String rankId Get the rank from the config file
+     *
+     * @return A soundparser object
+     *
+     */
     public SoundParser parseNoise(String rankId) {
         ConfigurationSection rankSection = file.getConfigurationSection("config.ranks." + rankId);
         if (rankSection != null && isSectionEnabled(rankId, "noise")) {
@@ -132,6 +256,15 @@ public class IConfig {
         return null;
     }
 
+    /**
+     * The getFireworks function is used to get the fireworks that are associated with a rank.
+     *
+     *
+     * @param String rankId Get the rank section from the config
+     *
+     * @return A list of fireworkparser objects
+     *
+     */
     public List<FireworkParser> getFireworks(String rankId) {
         List<FireworkParser> fireworks = new ArrayList<>();
         ConfigurationSection rankSection = file.getConfigurationSection("config.ranks." + rankId);
@@ -150,6 +283,16 @@ public class IConfig {
         return fireworks;
     }
 
+    /**
+     * The parseJoinBook function is used to parse a join book for the specified rank.
+     *
+     *
+     * @param Player player Set the placeholders in the book
+     * @param String rankId Get the rank section in the config
+     *
+     * @return An itemstack
+     *
+     */
     public ItemStack parseJoinBook(Player player, String rankId) {
         ConfigurationSection rankSection = file.getConfigurationSection("config.ranks." + rankId);
         if (rankSection != null && isSectionEnabled(rankId, "joinBook")) {
@@ -174,6 +317,15 @@ public class IConfig {
         return null;
     }
 
+    /**
+     * The parseBossBar function parses the boss bar configuration section of a rank.
+     *
+     *
+     * @param String rankId Get the rank section in the config
+     *
+     * @return A bossbarparser object
+     *
+     */
     public BossBarParser parseBossBar(String rankId) {
         ConfigurationSection rankSection = file.getConfigurationSection("config.ranks." + rankId);
         if (rankSection != null && isSectionEnabled(rankId, "bossBar")) {
@@ -190,7 +342,63 @@ public class IConfig {
         return null;
     }
 
-    public ItemStack parseJoinItem(String rankId, String itemName, Player player) {
+
+    /**
+     * The parseActions function parses the actions section of a rank's join item.
+     * It returns a list of Actions objects that can be executed by the JoinItem class.
+     *
+     *
+     * @param String rankId Get the rank id from the config
+     * @param String itemName Get the item name from the config
+     * @param String clickType Determine what actions to perform when the player clicks on the item
+     * @param Player player Get the player's name
+     *
+     * @return A list of actions
+     *
+     */
+    public List<Actions> parseActions(String rankId, String itemName, String clickType, Player player) {
+        ConfigurationSection actionsSection = file.getConfigurationSection("config.ranks." + rankId + ".joinItems." + itemName + ".actions");
+        List<Actions> actions = new ArrayList<>();
+
+        if (actionsSection != null) {
+            for (String actionString : actionsSection.getStringList(clickType)) {
+                if (actionString.startsWith("{") && actionString.endsWith("}")) {
+                    String[] parts = actionString.substring(1, actionString.length() - 1).split(":", 3);
+                    if (parts.length == 3) {
+                        String actionType = parts[0].toLowerCase();
+                        String actionTarget = parts[1];
+                        String actionMessage = parts[2].replaceAll("'", ""); // Remove single quotes
+
+                        switch (actionType) {
+                            case "heal":
+                                actions.add(new HealAction(actionTarget));
+                                break;
+                            case "msg":
+                                actions.add(new MessageAction(actionTarget, actionMessage));
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return actions;
+    }
+
+
+
+    /**
+     * The parseJoinItem function is used to parse the join items for a rank.
+     *
+     *
+     * @param String rankId Get the rank from the config
+     * @param String itemName Get the item from the config
+     * @param Player player Get the player's uuid
+     *
+     * @return An itemstack
+     *
+     */
+    public ItemStack parseJoinItem(String rankId, String itemName) {
         ConfigurationSection joinItemsSection = file.getConfigurationSection("config.ranks." + rankId + ".joinItems." + itemName);
         if (joinItemsSection != null && joinItemsSection.getBoolean("enabled")) {
             if (isRankEnabled(rankId)) {
@@ -230,6 +438,7 @@ public class IConfig {
 
                 itemStack.setItemMeta(itemMeta);
                 CustomNBTUtil.setStringNBTValue(itemStack, nameTagName, nameTagValue);
+
                 return itemStack;
             }
         }
@@ -237,6 +446,26 @@ public class IConfig {
         return null;
     }
 
+    /**
+     * The isCustomItem function checks if the item is a custom item.
+     *
+     *
+     * @param ItemStack item Check if the item has a custom name and lore
+     * @param String rankId Get the rankid of the player
+    public string getrankidforplayer(player player) {
+            if (player == null) {
+                return null;
+            }
+
+            for (string rank : file
+     * @param String itemName Get the configuration section for that item
+     * @param Player player Get the player's rankid
+    public string getrankidforplayer(player player) {
+            if (player == null || !player
+     *
+     * @return True if the item has the expected nbt tag, but i don't know how to check for that
+     *
+     */
     public boolean isCustomItem(ItemStack item, String rankId, String itemName, Player player) {
         if (item == null || !item.hasItemMeta()) {
             return false;

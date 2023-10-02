@@ -74,3 +74,8 @@ config:
               - "give %player_name% diamond 1"
             left_click:
               - "give %player_name% gold_ingot 2"
+          actions:
+            right_click:
+              - "{heal:Player}"
+            left_click:
+              - "{heal:Player}"

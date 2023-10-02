@@ -27,9 +27,14 @@ public class ConfigWrapper {
     }
 
 
-    public String getFileName(){
+    public String getFileName() {
         if (config == null || configFile == null) return null;
         else return configFile.getName();
+    }
+
+    public File getConfigFile() {
+        if (config == null || configFile == null) return null;
+        else return configFile.getAbsoluteFile();
     }
 
     public void loadConfig(String header) {

@@ -25,8 +25,20 @@ import java.util.List;
  */
 public class InventoryMoveItemEvent implements Listener {
 
-    IConfig config = ConfigManager.getConfig("config.yml",  Registry.instance.config.getConfig());
+    IConfig config = new ConfigManager(Registry.instance).getConfig("config.yml", Registry.instance.getConfig());
 
+    /**
+     * The onItemMove function is an event handler that prevents players from moving items in their inventory.
+     * This function is called whenever a player clicks on an item in their inventory, and it checks to see if the item
+     * has been marked as unmovable by the plugin. If so, then it cancels the click event and prevents them from moving
+     * or dropping that item. This function also checks to make sure that they are not clicking on air (an empty slot).
+
+     *
+     * @param InventoryClickEvent e Get the player who clicked, and the item they clicked
+     *
+     * @return A boolean, but i don't know what to return
+     *
+     */
     @EventHandler
     public void onItemMove(InventoryClickEvent e) {
         Player player = (Player) e.getWhoClicked();

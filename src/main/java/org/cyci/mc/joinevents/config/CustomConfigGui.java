@@ -23,9 +23,18 @@ import java.util.List;
  */
 public class CustomConfigGui {
 
-    IConfig config = ConfigManager.getConfig("config.yml", Registry.instance.config.getConfig());
+    IConfig config = new ConfigManager(Registry.instance).getConfig("config.yml", Registry.instance.getConfig());
 
 
+    /**
+     * The openRankEditor function opens a GUI for the player to edit ranks.
+     *
+     *
+     * @param Player player Open the inventory for that specific player
+     *
+     * @return Nothing so it should be void
+     *
+     */
     public void openRankEditor(Player player) {
         Inventory inventory = Bukkit.createInventory(null, 9);
 

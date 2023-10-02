@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
  */
 public class CooldownManager {
 
-    IConfig config = ConfigManager.getConfig("config.yml",  Registry.instance.config.getConfig());
+    IConfig config = new ConfigManager(Registry.instance).getConfig("config.yml", Registry.instance.getConfig());
     private static final Map<UUID, Map<String, Long>> cooldowns = new HashMap<>();
     private static CooldownManager instance;
 
