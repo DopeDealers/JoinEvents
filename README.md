@@ -78,3 +78,14 @@
   left_click:
     - "say %player_name% has just left clicked"
 ```
+
+### Action Configuration
+
+- **Actions**: Custom actions to run when the player right-clicks or left-clicks the custom item, defined as such.
+```
+  right_click:
+    - "{msg:Player:'&6&lHi this is a test friend!'}"
+  left_click:
+    - "{heal:Player}"
+    - "{msg:Player:'&a&lHello &6&l{player_name} &aYou have been healed'}"
+```
