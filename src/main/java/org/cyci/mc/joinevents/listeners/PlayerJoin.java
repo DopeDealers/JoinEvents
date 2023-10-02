@@ -35,6 +35,18 @@ public class PlayerJoin  implements Listener {
 
     IConfig config = new ConfigManager(Registry.instance).getConfig("config.yml", Registry.instance.getConfig());
 
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        // Record player login time
+        Registry.instance.getPlayerTimeTracker().recordLogin(event.getPlayer());
+
+        // You can also check and display the player's total playtime:
+        int playtimeMinutes = Registry.instance.getPlayerTimeTracker().getPlaytime(event.getPlayer());
+        int logins = Registry.instance.getPlayerTimeTracker().getLogins(event.getPlayer());
+
+        event.getPlayer().sendMessage("Welcome back! You have played for " + playtimeMinutes + " minutes over " + logins + " logins.");
+    }
+
     /**
      * The rankJoins function is called when a player joins the server.
      * It checks if the player has permission for any of the ranks, and if they do, it plays a sound, broadcasts a message to all players on the server (if there is one), shows them a boss bar (if there is one), gives them an item in their inventory (if there are any items specified) and shoots fireworks at their location.

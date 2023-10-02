@@ -12,13 +12,18 @@ import org.cyci.mc.joinevents.cmd.api.CommandRegistry;
 import org.cyci.mc.joinevents.config.ConfigWrapper;
 import org.cyci.mc.joinevents.config.IConfig;
 import org.cyci.mc.joinevents.config.Lang;
+import org.cyci.mc.joinevents.db.PlayerTimeTracker;
 import org.cyci.mc.joinevents.listeners.InventoryMoveItemEvent;
 import org.cyci.mc.joinevents.listeners.PlayerInteract;
 import org.cyci.mc.joinevents.listeners.PlayerJoin;
 import org.cyci.mc.joinevents.listeners.PlayerLeave;
 import org.cyci.mc.joinevents.manager.ConfigManager;
+import org.cyci.mc.joinevents.manager.ConfigurationManager;
+import org.cyci.mc.joinevents.manager.MySQLManager;
+import org.cyci.mc.joinevents.tasks.PlaytimeUpdaterTask;
 import org.cyci.mc.joinevents.utils.C;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -28,7 +33,9 @@ public final class Registry extends JavaPlugin {
     public ConfigWrapper messagesFile;
     public ConfigWrapper config;
     public static NamespacedKey UNMOVABLE_TAG_KEY;
-
+    public final ConfigurationManager configManager = new ConfigurationManager(this);
+    private MySQLManager mysqlManager;
+    private PlayerTimeTracker playerTimeTracker;
 
     @Override
     public void onEnable() {
@@ -37,6 +44,23 @@ public final class Registry extends JavaPlugin {
         // Initialize and load configuration files
         messagesFile = new ConfigWrapper(this, "messages.yml");
         config = new ConfigWrapper(this, "config.yml");
+        try {
+            mysqlManager.connect();
+        } catch (SQLException e) {
+            getLogger().severe("Failed to connect to MySQL: " + e.getMessage());
+        }
+        mysqlManager = new MySQLManager(configManager.getMySQLHost(),
+                                        configManager.getMySQLPort(),
+                                        configManager.getMySQLDatabase(),
+                                        configManager.getMySQLUsername(),
+                                        configManager.getMySQLPassword());
+
+        playerTimeTracker = new PlayerTimeTracker(mysqlManager);
+        try {
+            mysqlManager.connect();
+        } catch (SQLException e) {
+            getLogger().severe("Failed to connect to MySQL: " + e.getMessage());
+        }
 
         getLogger().info("Config loading status: " + (config.getConfig() != null ? "Loaded" : "Not Loaded"));
         getLogger().info("Messages config loading status: " + (messagesFile.getConfig() != null ? "Loaded" : "Not Loaded"));
@@ -54,11 +78,14 @@ public final class Registry extends JavaPlugin {
         new CommandRegistry();
          loadMessages();
 
+        int updateInterval = 1200; // 1200 ticks = 60 seconds (1 minute)
+        new PlaytimeUpdaterTask().runTaskTimer(this, 0, updateInterval);
         getLogger().info("Plugin enabled!");
     }
     @Override
     public void onDisable() {
         messagesFile.saveConfig();
+        Bukkit.getScheduler().cancelTasks(this);
         getLogger().info("Plugin disabled!");
     }
     private void loadMessages() {
@@ -85,5 +112,8 @@ public final class Registry extends JavaPlugin {
         }
         command.execute(s, args);
         return true;
+    }
+    public PlayerTimeTracker getPlayerTimeTracker() {
+        return playerTimeTracker;
     }
 }
