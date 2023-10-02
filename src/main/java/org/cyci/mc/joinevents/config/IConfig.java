@@ -356,28 +356,17 @@ public class IConfig {
      * @return A list of actions
      *
      */
-    public List<Actions> parseActions(String rankId, String itemName, String clickType, Player player) {
-        ConfigurationSection actionsSection = file.getConfigurationSection("config.ranks." + rankId + ".joinItems." + itemName + ".actions");
+    public List<Actions> parseActions(String rankId, String itemName, String clickType) {
         List<Actions> actions = new ArrayList<>();
+        ConfigurationSection actionsSection = file.getConfigurationSection("config.ranks." + rankId + ".joinItems." + itemName + ".actions");
 
-        if (actionsSection != null) {
-            for (String actionString : actionsSection.getStringList(clickType)) {
-                if (actionString.startsWith("{") && actionString.endsWith("}")) {
-                    String[] parts = actionString.substring(1, actionString.length() - 1).split(":", 3);
-                    if (parts.length == 3) {
-                        String actionType = parts[0].toLowerCase();
-                        String actionTarget = parts[1];
-                        String actionMessage = parts[2].replaceAll("'", ""); // Remove single quotes
+        if (actionsSection != null && actionsSection.isList(clickType)) {
+            List<String> actionStrings = actionsSection.getStringList(clickType);
 
-                        switch (actionType) {
-                            case "heal":
-                                actions.add(new HealAction(actionTarget));
-                                break;
-                            case "msg":
-                                actions.add(new MessageAction(actionTarget, actionMessage));
-                                break;
-                        }
-                    }
+            for (String actionString : actionStrings) {
+                Actions action = parseAction(actionString);
+                if (action != null) {
+                    actions.add(action);
                 }
             }
         }
@@ -385,7 +374,46 @@ public class IConfig {
         return actions;
     }
 
+    /**
+     * The parseAction function takes a string and returns an Action object.
+     * The string is expected to be in the format of: {actionType: actionValue}
+     *
+     * For example, if you wanted to create a HealAction that heals for 10 health points, you would pass in the following String: {heal: 10}
 
+     *
+     * @param String actionString Get the action type and value from the string
+     *
+     * @return An actions object
+     *
+     */
+    private Actions parseAction(String actionString) {
+        if (actionString.startsWith("{") && actionString.endsWith("}")) {
+            String actionContent = actionString.substring(1, actionString.length() - 1);
+            String[] parts = actionContent.split(":", 2);
+
+            if (parts.length == 2) {
+                String actionType = parts[0].trim().toLowerCase();
+                String actionValue = parts[1].trim();
+
+                switch (actionType) {
+                    case "heal":
+                        return new HealAction();
+                    case "msg":
+                        if (actionValue.startsWith("Player:")) {
+                            String message = actionValue.substring("Player:".length()).trim();
+                            message = message.replace("'", "");
+
+                            return new MessageAction(message);
+                        } else {
+                            actionValue = actionValue.replace("'", "");
+                            return new MessageAction(actionValue);
+                        }
+                }
+            }
+        }
+
+        return null;
+    }
 
     /**
      * The parseJoinItem function is used to parse the join items for a rank.

@@ -13,19 +13,14 @@ import org.cyci.mc.joinevents.utils.C;
  * @created Sun - 01/Oct/2023 - 9:13 PM
  */
 public class MessageAction implements Actions {
-    private final String actionTarget;
-    private String actionMessage = null;
+    private final String message;
 
-    public MessageAction(String actionTarget, String message) {
-        this.actionTarget = actionTarget;
-        this.actionMessage = actionMessage;
+    public MessageAction(String message) {
+        this.message = message;
     }
-
     @Override
     public void execute(Player player) {
-        if ("Player".equalsIgnoreCase(actionTarget)) {
-            String finalMessage = PlaceholderAPI.setPlaceholders(player, this.actionMessage);
-            player.sendMessage(C.c(finalMessage));
-        }
+        String finalMessage = PlaceholderAPI.setPlaceholders(player, this.message);
+        player.sendMessage(C.c(finalMessage));
     }
 }

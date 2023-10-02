@@ -48,13 +48,10 @@ public class PlayerInteract implements Listener {
     public void onPlayerInteractEntity(PlayerInteractEvent e) {
         Player player = e.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
-
         if (item != null && item.getType() != Material.AIR && e.getHand() == EquipmentSlot.HAND) {
             String rankId = config.getRankIdForPlayer(player);
-
             if (rankId != null) {
                 List<String> customItemNames = config.getJoinItemNames(rankId);
-
                 if (customItemNames != null) {
                     for (String itemName : customItemNames) {
                         if (itemName != null && !itemName.isEmpty()) {
@@ -69,24 +66,17 @@ public class PlayerInteract implements Listener {
                                     if (cooldownTime != null) {
                                         long cooldownMillis = cooldownManager.parseCooldownString(cooldownTime);
                                         long newCooldownEndTime = currentTime + cooldownMillis;
+                                        String clickType = e.getAction().isLeftClick() ? "left_click" : "right_click";
                                         CooldownManager.getInstance().addCooldown(player.getUniqueId(), itemName, newCooldownEndTime);
-                                        List<String> commandsR = config.getStringList("config.ranks." + rankId + ".joinItems." + itemName + ".commands.right_click");
-                                        List<String> commandsL = config.getStringList("config.ranks." + rankId + ".joinItems." + itemName + ".commands.left_click");
-                                        if (commandsR != null && !commandsR.isEmpty() && e.getAction().isRightClick()) {
-                                            for (String command : commandsR) {
-                                                command = PlaceholderAPI.setPlaceholders(player, command);
-                                                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
-                                            }
-                                        } else if (commandsL != null && !commandsL.isEmpty() && e.getAction().isLeftClick()){
-                                            for (String command : commandsL) {
+                                        List<String> commands = config.getStringList("config.ranks." + rankId + ".joinItems." + itemName + ".commands." + clickType);
+                                        if (commands != null && !commands.isEmpty() && e.getAction().isRightClick()) {
+                                            for (String command : commands) {
                                                 command = PlaceholderAPI.setPlaceholders(player, command);
                                                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
                                             }
                                         }
-                                        String clickTypeStr = (e.getAction().isLeftClick() == Action.PHYSICAL.isLeftClick())
-                                        ? "left_click" : "right_click";
 
-                                        List<Actions> actions = config.parseActions(rankId, itemName, clickTypeStr, player);
+                                        List<Actions> actions = config.parseActions(rankId, itemName, clickType);
 
                                         for (Actions action : actions) {
                                             action.execute(player);

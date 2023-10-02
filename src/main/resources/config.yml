@@ -10,7 +10,14 @@
 # HexColor support with default color coding options
 # Unlimited rank joins with support to enable to disable them without having to remove them
 # To color the bossbar check the link below out
+# Unlimited custom join items
 # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/boss/BarColor.html
+#
+# Actions: msg/heal
+# example {msg:Player:'&aHello player i have messaged just you!'}
+# example {heal:Player}
+# More soon to come.
+
 config:
   ranks:
     mvp:
@@ -76,6 +83,7 @@ config:
               - "give %player_name% gold_ingot 2"
           actions:
             right_click:
-              - "{heal:Player}"
+              - "{msg:Player:'&6&lHi this is a test friend!'}"
             left_click:
               - "{heal:Player}"
+              - "{msg:Player:'&a&lHello &6&l{player_name} &aYou have been healed'}"
