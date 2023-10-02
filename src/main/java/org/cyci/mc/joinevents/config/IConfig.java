@@ -57,34 +57,6 @@ public class IConfig {
     }
 
     /**
-     * The setJoinItemEnabled function sets the 'enabled' property for JoinItems in all ranks.
-     *
-     *
-     * @param String rank Specify which rank to set the join item for
-     * @param String itemName Specify which item to set the enabled property for
-     * @param boolean enabled Set the 'enabled' property of joinitems in all ranks
-    public void setjoinitemenabled(string itemname, boolean enabled) {
-
-     *
-     * @return A boolean, but i want it to return a string
-     *
-     */
-    public void setJoinItemEnabled(String rank, String itemName, boolean enabled) {
-        // Set the 'enabled' property for JoinItems in all ranks
-        ConfigurationSection ranksSection = file.getConfigurationSection("config.ranks");
-        if (ranksSection != null) {
-            String rankPath = "config.ranks." + rank + ".joinItems." + itemName + ".enabled";
-            file.set(rankPath, enabled);
-        }
-        try {
-            File configFile = new File(this.configName);
-
-            file.save(configFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    /**
      * The getFile function returns the file configuration of the config.yml file
      *
      *
@@ -95,6 +67,15 @@ public class IConfig {
     public FileConfiguration getFile() {
         return this.file;
     }
+    /**
+     * The getString function is used to get a string from the config.yml file.
+     *
+     *
+     * @param String path Get the value of a string from the config
+     *
+     * @return The value of a path in the config file
+     *
+     */
     public String getString(String path) {
         return file.getString(path);
     }
@@ -110,6 +91,19 @@ public class IConfig {
      */
     public List<String> getStringList(String path) {
         return file.getStringList(path);
+    }
+
+    /**
+     * The getInt function returns the integer value of a given path.
+     *
+     *
+     * @param String path Specify the path of the file that is being read
+     *
+     * @return The integer value of the path
+     *
+     */
+    public int getInt(String path) {
+        return file.getInt(path);
     }
 
 

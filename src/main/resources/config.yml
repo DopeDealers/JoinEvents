@@ -19,6 +19,13 @@
 # More soon to come.
 
 config:
+  database:
+    mysql:
+      host: localhost
+      port: 3306
+      database: mydatabase
+      username: your_username
+      password: your_password
   ranks:
     mvp:
       enabled: true
