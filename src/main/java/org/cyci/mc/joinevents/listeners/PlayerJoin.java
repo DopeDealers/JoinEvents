@@ -17,6 +17,7 @@ import org.cyci.mc.joinevents.Registry;
 import org.cyci.mc.joinevents.config.IConfig;
 import org.cyci.mc.joinevents.manager.ConfigManager;
 import org.cyci.mc.joinevents.parsers.BossBarParser;
+import org.cyci.mc.joinevents.tasks.IConfigAsyncTask;
 import org.cyci.mc.joinevents.utils.C;
 import org.cyci.mc.joinevents.parsers.FireworkParser;
 import org.cyci.mc.joinevents.parsers.SoundParser;
@@ -67,8 +68,7 @@ public class PlayerJoin  implements Listener {
                 if (soundParser != null) {
                     player.playSound(player.getLocation(), soundParser.getSound(), soundParser.getVolume(), soundParser.getPitch());
                 }
-                String message = config.parseMessage(player, rankId, "join");
-                Bukkit.broadcast(C.c(message));
+                new IConfigAsyncTask(Registry.instance, config, player, rankId, "join");
 
                 BossBarParser bossBarParser = config.parseBossBar(rankId);
                 if (bossBarParser != null) {

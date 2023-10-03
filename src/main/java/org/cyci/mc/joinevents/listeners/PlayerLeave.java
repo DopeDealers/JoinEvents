@@ -11,6 +11,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.cyci.mc.joinevents.Registry;
 import org.cyci.mc.joinevents.config.IConfig;
 import org.cyci.mc.joinevents.manager.ConfigManager;
+import org.cyci.mc.joinevents.tasks.IConfigAsyncTask;
 import org.cyci.mc.joinevents.utils.C;
 
 import java.util.ArrayList;
@@ -43,8 +44,7 @@ public class PlayerLeave implements Listener {
         for (String rankId : rankIds) {
             if (config.isRankEnabled(rankId) && config.hasPermission(player, rankId)) {
                 for (String itemName : config.getJoinItemNames(rankId)) {
-                    String message = config.parseMessage(player, rankId, "quit");
-                    Bukkit.broadcast(C.c(message));
+                    new IConfigAsyncTask(Registry.instance, config, player, rankId, "quit");
                     PlayerInventory inventory = player.getInventory();
                     ItemStack[] contents = inventory.getContents();
                     for (int i = 0; i < contents.length; i++) {
