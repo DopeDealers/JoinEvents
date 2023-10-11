@@ -1,14 +1,10 @@
 package org.cyci.mc.joinevents.utils;
 
-import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.md_5.bungee.api.ChatColor;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static net.md_5.bungee.api.ChatColor.COLOR_CHAR;
 
 /**
  * @author - Phil
@@ -18,8 +14,6 @@ import static net.md_5.bungee.api.ChatColor.COLOR_CHAR;
  * @created Sun - 20/Aug/2023 - 11:24 PM
  */
 public class C {
-
-    // Some code taken from spigot will find link soon
     public static Component c(String message)
     {
         Pattern pattern = Pattern.compile("(#[a-fA-F0-9]{6})");

@@ -17,14 +17,12 @@ import java.util.function.Consumer;
  */
 public class CustomNBTUtil {
 
-    // Method to get a string NBT tag value from an ItemStack
     public static String getStringNBTValue(ItemStack item, String tag) {
         String getNBTValue = NBT.get(item, nbt -> nbt.getString(tag));
         if (!getNBTValue.isEmpty()) return getNBTValue;
         return null; // Tag not found
     }
 
-    // Method to set a string NBT tag value on an ItemStack
     public static void setStringNBTValue(ItemStack item, String tag, String value) {
         NBT.modify(item, nbt -> {
             nbt.setString(tag, value);

@@ -27,6 +27,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public final class Registry extends JavaPlugin {
     public static Registry instance;
@@ -44,55 +45,73 @@ public final class Registry extends JavaPlugin {
         messagesFile = new ConfigWrapper(this, "messages.yml");
         config = new ConfigWrapper(this, "config.yml");
         ConfigurationManager configManager = new ConfigurationManager(this);
+        saveDefaultConfig();
 
-        mysqlManager = new MySQLManager(
-                configManager.getMySQLHost(),
-                configManager.getMySQLPort(),
-                configManager.getMySQLDatabase(),
-                configManager.getMySQLUsername(),
-                configManager.getMySQLPassword()
-        );
+        String mysqlHost = configManager.getMySQLHost();
+        int mysqlPort = configManager.getMySQLPort();
+        String mysqlDatabase = configManager.getMySQLDatabase();
+        String mysqlUsername = configManager.getMySQLUsername();
+        String mysqlPassword = configManager.getMySQLPassword();
 
-        mysqlManager.connectAsync().thenRun(() -> {
-            getLogger().info("Connected to MySQL!");
-            PaperCommandManager manager = new PaperCommandManager(instance);
-            manager.registerCommand(new JoinEventsCMD());
-            playerTimeTracker = new PlayerTimeTracker(mysqlManager);
-            mysqlManager.createPlayerDataTableAsync();
-            saveDefaultConfig();
-            try {
-                Bukkit.getServer().getPluginManager().registerEvents(new PlayerJoin(), this);
-                Bukkit.getServer().getPluginManager().registerEvents(new PlayerLeave(), this);
-                Bukkit.getServer().getPluginManager().registerEvents(new PlayerInteract(), this);
-                Bukkit.getServer().getPluginManager().registerEvents(new InventoryMoveItemEvent(), this);
-            } catch (Exception e) {
-                getLogger().info(e.getMessage());
-            } finally {
-                getLogger().info("Registered the events");
-            }
+        if (isMySQLConfigValid(mysqlHost, mysqlPort, mysqlDatabase, mysqlUsername, mysqlPassword)) {
+            mysqlManager = new MySQLManager(mysqlHost, mysqlPort, mysqlDatabase, mysqlUsername, mysqlPassword);
 
-            loadMessages();
+            mysqlManager.connectAsync().thenRun(() -> {
+                getLogger().info("Connected to MySQL!");
+                PaperCommandManager manager = new PaperCommandManager(instance);
+                manager.registerCommand(new JoinEventsCMD());
+                playerTimeTracker = new PlayerTimeTracker(this.mysqlManager.getDataSource());
+                try {
+                    Bukkit.getServer().getPluginManager().registerEvents(new PlayerJoin(), this);
+                    Bukkit.getServer().getPluginManager().registerEvents(new PlayerLeave(), this);
+                    Bukkit.getServer().getPluginManager().registerEvents(new PlayerInteract(), this);
+                    Bukkit.getServer().getPluginManager().registerEvents(new InventoryMoveItemEvent(), this);
+                } catch (Exception e) {
+                    getLogger().info(e.getMessage());
+                } finally {
+                    getLogger().info("Registered the events");
+                }
 
-            int updateInterval = 1200;
-            new PlaytimeUpdaterTask().runTaskTimer(this, 0, updateInterval);
-        }).exceptionally(e -> {
-            getLogger().severe("Failed to connect to MySQL: " + e.getMessage());
-            return null;
-        });
+                loadMessages();
+
+                int updateInterval = 1200;
+                new PlaytimeUpdaterTask().runTaskTimer(this, 0, updateInterval);
+            }).exceptionally(e -> {
+                getLogger().severe("Error: " + e.getMessage());
+                e.printStackTrace();
+                getLogger().severe("Disabling the plugin due to MySQL connection failure...");
+                getServer().getPluginManager().disablePlugin(this);
+                return null;
+            });
+        } else {
+            getLogger().severe("MySQL configuration is not valid. Please provide correct MySQL information in your config.yml.");
+            getLogger().severe("Disabling the plugin...");
+            getServer().getPluginManager().disablePlugin(this);
+        }
 
         getLogger().info("Plugin enabled!");
     }
     @Override
     public void onDisable() {
+        getLogger().info("Disabling plugin...");
+
         messagesFile.saveConfig();
+
         Bukkit.getScheduler().cancelTasks(this);
-        mysqlManager.closeConnectionAsync().thenRun(() -> {
-            getLogger().info("Shutting down MySQL!");
-        }).exceptionally(e -> {
-            getLogger().info("Failed to shutdown MySQL: " + e.getMessage());
-            return null;
-        });
-        getLogger().info("Plugin disabled!");
+
+        CompletableFuture<Void> closeConnectionFuture = mysqlManager.closeConnectionAsync();
+        closeConnectionFuture
+                .thenRun(() -> {
+                    getLogger().info("MySQL connection closed successfully.");
+                    mysqlManager.shutdown();
+                    getLogger().info("Executor service for MySQL manager shut down.");
+                    getLogger().info("Plugin disabled!");
+                })
+                .exceptionally(e -> {
+                    getLogger().severe("Error during MySQL connection closure: " + e.getMessage());
+                    e.printStackTrace();
+                    return null;
+                });
     }
     private void loadMessages() {
         Lang.setFile(this.messagesFile.getConfig());
@@ -103,5 +122,8 @@ public final class Registry extends JavaPlugin {
     }
     public PlayerTimeTracker getPlayerTimeTracker() {
         return playerTimeTracker;
+    }
+    private boolean isMySQLConfigValid(String host, int port, String database, String username, String password) {
+        return !host.isEmpty() && port > 0 && !database.isEmpty() && !username.isEmpty() && password != null;
     }
 }

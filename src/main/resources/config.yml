@@ -26,6 +26,22 @@ config:
       database: mydatabase
       username: your_username
       password: your_password
+  time:
+    rewards:
+      reward1: # Unique reward ID
+        name: "Reward 1" # Name of the reward
+        command: "give %player% diamond 1" # Command to execute for the reward
+        required-playtime: 174 # Required playtime in minutes
+        multiplier:
+          mvp: 5 # Multiplier for Rank 1
+          rank2: 2.0 # Multiplier for Rank 2
+      reward2: # Another unique reward
+        name: "Reward 2"
+        command: "give %player% gold_ingot 64"
+        required-playtime: 240
+        multiplier:
+          rank1: 2.0
+          rank2: 2.5
   ranks:
     mvp:
       enabled: true
@@ -33,61 +49,60 @@ config:
       messages:
         enabled: true
         join: "&7[&6&lMVP&7] &6%player_name% &7Has joined the server!"
-        quit: "&7[&6&lMVP&7] &6%player_name% &7Has left the server ):"
+        quit: "&7[&6&lMVP&7] &6%player_name% &7Has left the server ):" # Quit message
       noise:
         enabled: true
-        sound: "ENTITY_EXPERIENCE_ORB_PICKUP"
-        volume: 10
-        pitch: 1.5
+        sound: "ENTITY_EXPERIENCE_ORB_PICKUP" # Sound for the rank
+        volume: 10 # Sound volume
+        pitch: 1.5 # Sound pitch
       fireworks:
         enabled: true
         flicker: false
         trail: true
         mainColor: 16777215
         fadeColor: 16777215
-        type: "BALL"
+        type: "BALL" # Firework type
       joinBook:
         enabled: true
         title: Welcome to the server mvp
         author: "Prisk"
         pages:
           - This is the join message for page 1
-          - this is second page
+          - this is the second page
           - third
           - fourth
       bossBar:
         enabled: true
-        color: "WHITE"
-        style: "SOLID"
+        color: "WHITE" # Boss bar color
+        style: "SOLID" # Boss bar style
         title: "Hello!"
-        time: 1
-        progress: 1.0
+        time: 1 # Boss bar display time
+        progress: 1.0 # Boss bar progress
       joinItems:
         compass_1:
           enabled: true
-          unmoveable: true
-          material: "DIAMOND_SWORD"
+          unmovable: true
+          material: "DIAMOND_SWORD" # Item material
           nameTag:
             nbtTagName: "customItem"
             nbtValue: "specialSword"
-          name: "&aCustom Sword"
+          name: "&aCustom Sword" # Item name
           lore:
-            - "&7This is a custom sword."
-          slot: 0
+            - "&7This is a custom sword." # Item lore
+          slot: 0 # Item slot in the inventory
           enchantments:
             SHARPNESS: 5
-            UNBREAKING: 3
-          uses: 10
-          #unlimitedUses: true  # Set this to true for unlimited uses
+            UNBREAKING: 3 # Item enchantments
+          uses: 10 # Item uses
           cooldown:
-            time: "10s"
+            time: "10s" # Cooldown time
             message: "Cooldown: %s"
           commands:
             right_click:
               - "say Welcome, %player_name%, to the server!"
-              - "give %player_name% diamond 1"
+              - "give %player_name% diamond 1" # Commands on right-click
             left_click:
-              - "give %player_name% gold_ingot 2"
+              - "give %player_name% gold_ingot 2" # Commands on left-click
           actions:
             right_click:
               - "{msg:Player:'&6&lHi this is a test friend!'}"

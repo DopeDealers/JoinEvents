@@ -31,22 +31,22 @@ public class JoinEventsCMD extends BaseCommand {
         page.append("&a&lJoinEvents\n\n");
 
         page.append("&6Developer: &aPrisk\n");
-        page.append("&6Version: &a1.0.0\n");
+        page.append("&6Version: &a" + "\n");
         sender.sendMessage(C.c(page.toString()));
     }
 
     @Subcommand("time")
     @Description("Display player's tracked playtime")
     public void onTime(CommandSender sender, @Flags("other") Player target) {
-        int playtime = Registry.instance.getPlayerTimeTracker().getPlaytime(target);
-        sender.sendMessage(C.c(target.getName() + "&7's Playtime: &b" + playtime + " &7minutes"));
+        int playtime = Registry.instance.getPlayerTimeTracker().getPlaytime(target.getUniqueId().toString());
+        sender.sendMessage(C.c("&7" + target.getName() + "'s Playtime: &b" + playtime + " &7minutes"));
     }
 
     @Subcommand("logins")
     @Description("Display player's login count")
     public void onLogins(CommandSender sender, @Flags("other") Player target) {
-        int logins = Registry.instance.getPlayerTimeTracker().getLogins(target);
-        sender.sendMessage(C.c("&a" + target.getName() + "&7's Logins: &b" + logins));
+        int logins = Registry.instance.getPlayerTimeTracker().getLogins(target.getUniqueId().toString());
+        sender.sendMessage(C.c("&7" + target.getName() + "'s Logins: &b" + logins));
     }
 
     @Subcommand("reload")

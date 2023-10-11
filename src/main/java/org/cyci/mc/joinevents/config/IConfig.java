@@ -133,6 +133,10 @@ public class IConfig {
         ConfigurationSection rankSection = file.getConfigurationSection("config.ranks." + rankId);
         return rankSection != null && rankSection.getBoolean(".enabled");
     }
+    public boolean isRankEnabled(ConfigurationSection rankId) {
+        ConfigurationSection rankSection = file.getConfigurationSection("config.ranks." + rankId);
+        return rankSection != null && rankSection.getBoolean(".enabled");
+    }
 
     /**
      * The isSectionEnabled function checks if a section is enabled for a rank.
@@ -144,6 +148,9 @@ public class IConfig {
      * @return The value of the ranksection and section
      *
      */
+    public boolean isSectionEnabled(ConfigurationSection rankSection, String section) {
+        return rankSection != null && rankSection.getBoolean(section + ".enabled");
+    }
     public boolean isSectionEnabled(String rankId, String section) {
         ConfigurationSection rankSection = file.getConfigurationSection("config.ranks." + rankId);
         return rankSection != null && rankSection.getBoolean(section + ".enabled");
@@ -215,7 +222,7 @@ public class IConfig {
      */
     public String parseMessage(Player player, String rankId, String messageType) {
         ConfigurationSection rankSection = file.getConfigurationSection("config.ranks." + rankId);
-        if (rankSection != null && isSectionEnabled(rankId, "messages")) {
+        if (rankSection != null && isSectionEnabled(rankSection, "messages")) {
             String message = rankSection.getString("messages." + messageType);
             if (message != null) {
                 String finalMessage = PlaceholderAPI.setPlaceholders(player, message);
@@ -249,6 +256,21 @@ public class IConfig {
         }
         return null;
     }
+    public SoundParser parseNoise(ConfigurationSection rankSection) {
+        if (rankSection != null && isSectionEnabled(rankSection, "noise")) {
+            if (isRankEnabled(rankSection)) {
+                String noise = rankSection.getString("noise.sound");
+                if (noise != null) {
+                    Sound sound = Sound.valueOf(noise);
+                    float volume = (float) rankSection.getDouble("noise.volume", 1.0);
+                    float pitch = (float) rankSection.getDouble("noise.pitch", 1.0);
+                    return new SoundParser(sound, volume, pitch);
+                }
+            }
+        }
+        return null;
+    }
+
 
     /**
      * The getFireworks function is used to get the fireworks that are associated with a rank.
@@ -289,7 +311,7 @@ public class IConfig {
      */
     public ItemStack parseJoinBook(Player player, String rankId) {
         ConfigurationSection rankSection = file.getConfigurationSection("config.ranks." + rankId);
-        if (rankSection != null && isSectionEnabled(rankId, "joinBook")) {
+        if (rankSection != null && isSectionEnabled(rankSection, "joinBook")) {
             if (isRankEnabled(rankId)) {
                 ItemStack joinBook = new ItemStack(Material.WRITTEN_BOOK);
                 BookMeta bookMeta = (BookMeta) joinBook.getItemMeta();
@@ -322,7 +344,7 @@ public class IConfig {
      */
     public BossBarParser parseBossBar(String rankId) {
         ConfigurationSection rankSection = file.getConfigurationSection("config.ranks." + rankId);
-        if (rankSection != null && isSectionEnabled(rankId, "bossBar")) {
+        if (rankSection != null && isSectionEnabled(rankSection, "bossBar")) {
             if (isRankEnabled(rankId)) {
                 BarColor color = BarColor.valueOf(rankSection.getString("bossBar.color", "WHITE"));
                 BarStyle style = BarStyle.valueOf(rankSection.getString("bossBar.style", "SOLID"));
@@ -336,6 +358,47 @@ public class IConfig {
         return null;
     }
 
+    public SoundParser parseCustomRewardNoise(String rewardId) {
+        ConfigurationSection rewardsSection = file.getConfigurationSection("config.time.rewards");
+        if (rewardsSection == null || !rewardsSection.contains(rewardId)) {
+            return null; // No custom sound configured for this reward
+        }
+
+        ConfigurationSection rewardSection = rewardsSection.getConfigurationSection(rewardId);
+        return parseNoise(rewardSection);
+    }
+
+    public boolean isRewardEnabled(String rewardId) {
+        ConfigurationSection rewardsSection = file.getConfigurationSection("config.time.rewards");
+        return rewardsSection != null && rewardsSection.getBoolean(rewardId + ".enabled");
+    }
+
+    public int getRequiredPlaytime(String rewardId) {
+        ConfigurationSection rewardsSection = file.getConfigurationSection("config.time.rewards");
+        return rewardsSection != null ? rewardsSection.getInt(rewardId + ".required-playtime") : 0;
+    }
+    public String getRewardCommand(String rankId) {
+        ConfigurationSection rewardsSection = file.getConfigurationSection("config.time.rewards");
+        if (rewardsSection == null || !rewardsSection.contains(rankId)) {
+            return null; // No custom command configured for this reward
+        }
+
+        ConfigurationSection rewardSection = rewardsSection.getConfigurationSection(rankId);
+        return rewardSection.getString("command", null);
+    }
+
+    public Map<String, Double> getRewardMultipliers(String rewardId) {
+        ConfigurationSection rewardsSection = file.getConfigurationSection("config.rewards");
+        if (rewardsSection != null && rewardsSection.contains(rewardId + ".multiplier")) {
+            ConfigurationSection multiplierSection = rewardsSection.getConfigurationSection(rewardId + ".multiplier");
+            Map<String, Double> multipliers = new HashMap<>();
+            for (String rank : multiplierSection.getKeys(false)) {
+                multipliers.put(rank, multiplierSection.getDouble(rank));
+            }
+            return multipliers;
+        }
+        return Collections.emptyMap();
+    }
 
     /**
      * The parseActions function parses the actions section of a rank's join item.
@@ -512,19 +575,34 @@ public class IConfig {
         if (!expectedNbtValue.equals(actualNbtValue)) {
             return false;
         }
+
         String rankForItem = getRankIdForPlayer(player);
 
         if (rankForItem != null && rankForItem.equals(rankId)) {
             if (customItemSection.isInt("uses")) {
                 int uses = customItemSection.getInt("uses");
-                int currentUses = CustomNBTUtil.getIntNBTValue(item, "uses");
+                boolean unlimitedUses = customItemSection.getBoolean("unlimitedUses", false);
 
-                if (currentUses >= uses) {
-                    player.getInventory().removeItem(item);
-                    return false;
+                // Check if unlimitedUses is true
+                if (!unlimitedUses) {
+                    // Check if the item has a "uses" NBT tag
+                    if (CustomNBTUtil.getStringNBTValue(item, "uses") == null) {
+                        // Initialize the "uses" NBT tag if it doesn't exist
+                        CustomNBTUtil.setIntNBTValue(item, "uses", 0);
+                    }
+
+                    int currentUses = CustomNBTUtil.getIntNBTValue(item, "uses");
+
+                    if (currentUses >= uses) {
+                        // Remove the item if it has reached the maximum uses
+                        player.getInventory().removeItem(item);
+                        return false;
+                    }
+
+                    // Increment the number of uses and update the NBT tag
+                    currentUses++;
+                    CustomNBTUtil.setIntNBTValue(item, "uses", currentUses);
                 }
-                currentUses++;
-                CustomNBTUtil.setIntNBTValue(item, "uses", currentUses);
             }
 
             return true;

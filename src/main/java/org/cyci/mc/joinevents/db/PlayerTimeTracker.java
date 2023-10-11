@@ -1,6 +1,8 @@
 package org.cyci.mc.joinevents.db;
 
+import com.zaxxer.hikari.HikariDataSource;
 import org.bukkit.entity.Player;
+import org.cyci.mc.joinevents.Registry;
 import org.cyci.mc.joinevents.manager.MySQLManager;
 
 import java.sql.Connection;
@@ -16,19 +18,48 @@ import java.sql.SQLException;
  * @created Mon - 02/Oct/2023 - 4:37 PM
  */
 public class PlayerTimeTracker {
-    private final MySQLManager mysqlManager;
+    private final HikariDataSource dataSource;
 
-    public PlayerTimeTracker(MySQLManager mysqlManager) {
-        this.mysqlManager = mysqlManager;
+    public PlayerTimeTracker(HikariDataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
-    public void recordLogin(Player player) {
+    public void addPlayerIfNotExists(Player player) {
         String uuid = player.getUniqueId().toString();
-        try {
-            Connection connection = mysqlManager.getConnection();
-            PreparedStatement statement = connection.prepareStatement(
-                    "UPDATE player_data SET logins = logins + 1 WHERE uuid = ?"
-            );
+
+        if (!playerExists(uuid)) {
+            try (Connection conn = dataSource.getConnection();
+                 PreparedStatement statement = conn.prepareStatement(
+                         "INSERT INTO player_data (uuid, logins, playtime_minutes) VALUES (?, 0, 0)")) {
+                statement.setString(1, uuid);
+                statement.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public boolean playerExists(String uuid) {
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement statement = conn.prepareStatement(
+                     "SELECT COUNT(*) AS count FROM player_data WHERE uuid = ?")) {
+            statement.setString(1, uuid);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                int count = resultSet.getInt("count");
+                return count > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public void recordLogin(String uuid) {
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement statement = conn.prepareStatement(
+                     "UPDATE player_data SET logins = logins + 1 WHERE uuid = ?")) {
+
             statement.setString(1, uuid);
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -36,13 +67,11 @@ public class PlayerTimeTracker {
         }
     }
 
-    public void recordPlaytime(Player player, int minutes) {
-        String uuid = player.getUniqueId().toString();
-        try {
-            Connection connection = mysqlManager.getConnection();
-            PreparedStatement statement = connection.prepareStatement(
-                    "UPDATE player_data SET playtime_minutes = playtime_minutes + ? WHERE uuid = ?"
-            );
+    public void recordPlaytime(String uuid, int minutes) {
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement statement = conn.prepareStatement(
+                     "UPDATE player_data SET playtime_minutes = playtime_minutes + ? WHERE uuid = ?")) {
+
             statement.setInt(1, minutes);
             statement.setString(2, uuid);
             statement.executeUpdate();
@@ -51,13 +80,11 @@ public class PlayerTimeTracker {
         }
     }
 
-    public int getPlaytime(Player player) {
-        String uuid = player.getUniqueId().toString();
-        try {
-            Connection connection = mysqlManager.getConnection();
-            PreparedStatement statement = connection.prepareStatement(
-                    "SELECT playtime_minutes FROM player_data WHERE uuid = ?"
-            );
+    public int getPlaytime(String uuid) {
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement statement = conn.prepareStatement(
+                     "SELECT playtime_minutes FROM player_data WHERE uuid = ?")) {
+
             statement.setString(1, uuid);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
@@ -69,13 +96,11 @@ public class PlayerTimeTracker {
         return 0;
     }
 
-    public int getLogins(Player player) {
-        String uuid = player.getUniqueId().toString();
-        try {
-            Connection connection = mysqlManager.getConnection();
-            PreparedStatement statement = connection.prepareStatement(
-                    "SELECT logins FROM player_data WHERE uuid = ?"
-            );
+    public int getLogins(String uuid) {
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement statement = conn.prepareStatement(
+                     "SELECT logins FROM player_data WHERE uuid = ?")) {
+
             statement.setString(1, uuid);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {

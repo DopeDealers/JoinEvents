@@ -36,14 +36,14 @@ public class PlayerJoin  implements Listener {
 
     IConfig config = new ConfigManager(Registry.instance).getConfig("config.yml", Registry.instance.getConfig());
 
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        // Record player login time
-        Registry.instance.getPlayerTimeTracker().recordLogin(event.getPlayer());
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerJoinTimeAndJoinTrackers(PlayerJoinEvent event) {
 
-        // You can also check and display the player's total playtime:
-        int playtimeMinutes = Registry.instance.getPlayerTimeTracker().getPlaytime(event.getPlayer());
-        int logins = Registry.instance.getPlayerTimeTracker().getLogins(event.getPlayer());
+        Registry.instance.getPlayerTimeTracker().addPlayerIfNotExists(event.getPlayer());
+        Registry.instance.getPlayerTimeTracker().recordLogin(event.getPlayer().getUniqueId().toString());
+
+        int playtimeMinutes = Registry.instance.getPlayerTimeTracker().getPlaytime(event.getPlayer().getUniqueId().toString());
+        int logins = Registry.instance.getPlayerTimeTracker().getLogins(event.getPlayer().getUniqueId().toString());
 
         event.getPlayer().sendMessage("Welcome back! You have played for " + playtimeMinutes + " minutes over " + logins + " logins.");
     }

@@ -28,7 +28,6 @@ public class CooldownManager {
             "(?:(\\d+)d\\s*)?(?:(\\d+)h\\s*)?(?:(\\d+)m\\s*)?(?:(\\d+)s)?"
     );
     public CooldownManager() {
-        // Private constructor to enforce singleton pattern
     }
 
     public static CooldownManager getInstance() {
@@ -47,16 +46,7 @@ public class CooldownManager {
             int minutes = parseGroup(matcher.group(3));
             int seconds = parseGroup(matcher.group(4));
 
-            // Debugging log statements
-            Registry.instance.getLogger().info("Days: " + days);
-            Registry.instance.getLogger().info("Hours: " + hours);
-            Registry.instance.getLogger().info("Minutes: " + minutes);
-            Registry.instance.getLogger().info("Seconds: " + seconds);
-
             long totalMillis = daysToMillis(days) + hoursToMillis(hours) + minutesToMillis(minutes) + secondsToMillis(seconds);
-
-            // Debugging log statement
-            Registry.instance.getLogger().info("Total Millis: " + totalMillis);
 
             return totalMillis;
         }
@@ -96,12 +86,11 @@ public class CooldownManager {
         Map<String, Long> playerCooldowns = cooldowns.get(playerId);
         if (playerCooldowns != null) {
             Long endTime = playerCooldowns.get(customItemName);
-            Registry.instance.getLogger().info("cooldownEndTime: " + endTime);
             if (endTime != null) {
                 return endTime;
             }
         }
-        return 0; // Return 0 if no cooldown is found (expired or never set)
+        return 0;
     }
 
     public void removeCooldown(UUID playerId, String customItemName) {
