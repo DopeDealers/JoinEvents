@@ -14,6 +14,7 @@ import org.cyci.mc.joinevents.utils.C;
  * @email - staff@cyci.org
  * @created Tue - 03/Oct/2023 - 2:02 PM
  */
+// TODO add correct command info and correct configuration for the commands and subcommands
 @CommandAlias("je|joinevents")
 @CommandPermission("joinevents.commands.main")
 public class JoinEventsCMD extends BaseCommand {

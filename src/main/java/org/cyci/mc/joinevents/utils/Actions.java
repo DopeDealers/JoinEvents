@@ -1,5 +1,6 @@
 package org.cyci.mc.joinevents.utils;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 /**
@@ -11,5 +12,5 @@ import org.bukkit.entity.Player;
  */
 public interface Actions {
    void execute(Player player);
-
+   void loadFromConfig(ConfigurationSection config);
 }

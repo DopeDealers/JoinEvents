@@ -108,4 +108,4 @@ config:
               - "{msg:Player:'&6&lHi this is a test friend!'}"
             left_click:
               - "{heal:Player}"
-              - "{msg:Player:'&a&lHello &6&l{player_name} &aYou have been healed'}"
+              - "{msg:Player:'&a&lHello &6&l%player_name% &aYou have been healed'}"

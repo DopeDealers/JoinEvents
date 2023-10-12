@@ -562,7 +562,6 @@ public class IConfig {
             return false;
         }
 
-        // Check if the item has the expected NBT tag
         String nbtTagName = customItemSection.getString("nameTag.nbtTagName");
         String expectedNbtValue = customItemSection.getString("nameTag.nbtValue");
 
@@ -583,23 +582,18 @@ public class IConfig {
                 int uses = customItemSection.getInt("uses");
                 boolean unlimitedUses = customItemSection.getBoolean("unlimitedUses", false);
 
-                // Check if unlimitedUses is true
                 if (!unlimitedUses) {
-                    // Check if the item has a "uses" NBT tag
                     if (CustomNBTUtil.getStringNBTValue(item, "uses") == null) {
-                        // Initialize the "uses" NBT tag if it doesn't exist
                         CustomNBTUtil.setIntNBTValue(item, "uses", 0);
                     }
 
                     int currentUses = CustomNBTUtil.getIntNBTValue(item, "uses");
 
                     if (currentUses >= uses) {
-                        // Remove the item if it has reached the maximum uses
                         player.getInventory().removeItem(item);
                         return false;
                     }
 
-                    // Increment the number of uses and update the NBT tag
                     currentUses++;
                     CustomNBTUtil.setIntNBTValue(item, "uses", currentUses);
                 }
