@@ -54,7 +54,7 @@ public class MySQLManager {
 
     public CompletableFuture<Void> closeConnectionAsync() {
         if (isShuttingDown.get()) {
-            return CompletableFuture.completedFuture(null); // Already shutting down, no need to close again
+            return CompletableFuture.completedFuture(null);
         }
 
         isShuttingDown.set(true);
@@ -84,7 +84,7 @@ public class MySQLManager {
 
     public void shutdown() {
         if (isShuttingDown.compareAndSet(false, true)) {
-            closeConnectionAsync().join(); // Ensure the connection is closed before shutting down
+            closeConnectionAsync().join();
             shutdownExecutorService();
             Registry.instance.getLogger().info("Executor service for MySQL manager shut down.");
             Registry.instance.getLogger().info("Plugin disabled!");

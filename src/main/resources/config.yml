@@ -26,6 +26,25 @@ config:
       database: mydatabase
       username: your_username
       password: your_password
+  welcomeMessage:
+    enabled: true
+    actionBar:
+      title:
+      subtitle:
+      foreverBar:
+    display: -|
+      Sex
+  leaderboard: # for top logins and top time played
+    x: 100.0
+    y: 70.0
+    z: 100.0
+    world: world_name
+  scoreboard:
+    title: "&aMy Scoreboard"
+    lines:
+      - "&eLine 1"
+      - "&6Line 2"
+      - "&cLine 3"
   time:
     rewards:
       reward1: # Unique reward ID
@@ -94,6 +113,7 @@ config:
             SHARPNESS: 5
             UNBREAKING: 3 # Item enchantments
           uses: 10 # Item uses
+          unlimtedUses: false
           cooldown:
             time: "10s" # Cooldown time
             message: "Cooldown: %s"

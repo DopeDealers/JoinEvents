@@ -1,5 +1,6 @@
 package org.cyci.mc.joinevents.actions;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.cyci.mc.joinevents.utils.Actions;
 
@@ -14,5 +15,10 @@ public class HealAction implements Actions {
     @Override
     public void execute(Player player) {
         player.setHealth(20);
+    }
+
+    @Override
+    public void loadFromConfig(ConfigurationSection config) {
+
     }
 }

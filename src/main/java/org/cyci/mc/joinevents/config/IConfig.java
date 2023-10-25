@@ -67,6 +67,19 @@ public class IConfig {
     public FileConfiguration getFile() {
         return this.file;
     }
+
+    /**
+     * The contains function checks to see if the file contains a path.
+     *
+     *
+     * @param String path Find the path of the file
+     *
+     * @return True if the path is a file or directory
+     *
+     */
+    public boolean contains(String path) {
+        return file.contains(path);
+    }
     /**
      * The getString function is used to get a string from the config.yml file.
      *
@@ -108,6 +121,19 @@ public class IConfig {
 
 
     /**
+     * The getLocation function returns the location of a file or directory.
+     *
+     *
+     * @param String path Specify the path of the file
+     *
+     * @return A location object
+     *
+     */
+    public Location getLocation(String path) {
+        return file.getLocation(path);
+    }
+
+    /**
      * The getAllRanks function returns a list of all the ranks in the config.yml file.
      *
      *
@@ -145,7 +171,7 @@ public class IConfig {
      * @param String rankId Get the rank section in the config
      * @param String section Get the section of the config
      *
-     * @return The value of the ranksection and section
+     * @return A boolean value if section is enabled
      *
      */
     public boolean isSectionEnabled(ConfigurationSection rankSection, String section) {
@@ -243,22 +269,15 @@ public class IConfig {
      */
     public SoundParser parseNoise(String rankId) {
         ConfigurationSection rankSection = file.getConfigurationSection("config.ranks." + rankId);
-        if (rankSection != null && isSectionEnabled(rankId, "noise")) {
-            if (isRankEnabled(rankId)) {
-                String noise = rankSection.getString("noise.sound");
-                if (noise != null) {
-                    Sound sound = Sound.valueOf(noise);
-                    float volume = (float) rankSection.getDouble("noise.volume", 1.0);
-                    float pitch = (float) rankSection.getDouble("noise.pitch", 1.0);
-                    return new SoundParser(sound, volume, pitch);
-                }
-            }
-        }
-        return null;
+        return getSoundParser(rankSection, isSectionEnabled(rankId, "noise"), isRankEnabled(rankId));
     }
     public SoundParser parseNoise(ConfigurationSection rankSection) {
-        if (rankSection != null && isSectionEnabled(rankSection, "noise")) {
-            if (isRankEnabled(rankSection)) {
+        return getSoundParser(rankSection, isSectionEnabled(rankSection, "noise"), isRankEnabled(rankSection));
+    }
+
+    private SoundParser getSoundParser(ConfigurationSection rankSection, boolean noise2, boolean rankEnabled) {
+        if (rankSection != null && noise2) {
+            if (rankEnabled) {
                 String noise = rankSection.getString("noise.sound");
                 if (noise != null) {
                     Sound sound = Sound.valueOf(noise);
@@ -344,20 +363,28 @@ public class IConfig {
      */
     public BossBarParser parseBossBar(String rankId) {
         ConfigurationSection rankSection = file.getConfigurationSection("config.ranks." + rankId);
-        if (rankSection != null && isSectionEnabled(rankSection, "bossBar")) {
-            if (isRankEnabled(rankId)) {
-                BarColor color = BarColor.valueOf(rankSection.getString("bossBar.color", "WHITE"));
-                BarStyle style = BarStyle.valueOf(rankSection.getString("bossBar.style", "SOLID"));
-                String title = rankSection.getString("bossBar.title", "Boss Bar");
-                int time = rankSection.getInt("bossBar.time", 1);
-                float progress = (float) rankSection.getDouble("bossBar.progress", 1.0);
+        if (isSectionEnabled(rankSection, "bossBar") && isRankEnabled(rankId)) {
+            BarColor color = BarColor.valueOf(rankSection.getString("bossBar.color", "WHITE"));
+            BarStyle style = BarStyle.valueOf(rankSection.getString("bossBar.style", "SOLID"));
+            String title = rankSection.getString("bossBar.title", "Boss Bar");
+            int time = rankSection.getInt("bossBar.time", 1);
+            float progress = (float) rankSection.getDouble("bossBar.progress", 1.0);
 
-                return new BossBarParser(color, style, title, time, progress);
-            }
+            return new BossBarParser(color, style, title, time, progress);
         }
+
         return null;
     }
 
+    /**
+     * The parseCustomRewardNoise function parses the custom reward noise for a given reward.
+     *
+     *
+     * @param String rewardId Get the reward section from the config
+     *
+     * @return A soundparser object
+     *
+     */
     public SoundParser parseCustomRewardNoise(String rewardId) {
         ConfigurationSection rewardsSection = file.getConfigurationSection("config.time.rewards");
         if (rewardsSection == null || !rewardsSection.contains(rewardId)) {
@@ -368,15 +395,44 @@ public class IConfig {
         return parseNoise(rewardSection);
     }
 
+    /**
+     * The isRewardEnabled function checks to see if a reward is enabled in the config.yml file.
+     *
+     *
+     * @param String rewardId Get the reward from the config
+     *
+     * @return A boolean value, true or false
+     *
+     */
     public boolean isRewardEnabled(String rewardId) {
         ConfigurationSection rewardsSection = file.getConfigurationSection("config.time.rewards");
         return rewardsSection != null && rewardsSection.getBoolean(rewardId + ".enabled");
     }
 
+    /**
+     * The getRequiredPlaytime function returns the required playtime for a given reward.
+     *
+     *
+     * @param String rewardId Get the required playtime for a specific reward
+     *
+     * @return The required playtime for the reward with the given id
+     *
+     */
     public int getRequiredPlaytime(String rewardId) {
         ConfigurationSection rewardsSection = file.getConfigurationSection("config.time.rewards");
         return rewardsSection != null ? rewardsSection.getInt(rewardId + ".required-playtime") : 0;
     }
+    /**
+     * The getRewardCommand function returns the command that should be executed when a player
+     * receives a reward. The rankId parameter is used to determine which reward's command should
+     * be returned. If no custom command has been configured for this rank, then null will be returned.
+
+     *
+     * @param String rankId Get the rankid from the config
+     *
+     * @return A string
+     *
+     */
     public String getRewardCommand(String rankId) {
         ConfigurationSection rewardsSection = file.getConfigurationSection("config.time.rewards");
         if (rewardsSection == null || !rewardsSection.contains(rankId)) {
@@ -384,14 +440,25 @@ public class IConfig {
         }
 
         ConfigurationSection rewardSection = rewardsSection.getConfigurationSection(rankId);
+        assert rewardSection != null;
         return rewardSection.getString("command", null);
     }
 
+    /**
+     * The getRewardMultipliers function returns a map of multipliers for the specified reward.
+     *
+     *
+     * @param String rewardId Get the reward multipliers for a specific reward
+     *
+     * @return A map of multipliers
+     *
+     */
     public Map<String, Double> getRewardMultipliers(String rewardId) {
         ConfigurationSection rewardsSection = file.getConfigurationSection("config.rewards");
         if (rewardsSection != null && rewardsSection.contains(rewardId + ".multiplier")) {
             ConfigurationSection multiplierSection = rewardsSection.getConfigurationSection(rewardId + ".multiplier");
             Map<String, Double> multipliers = new HashMap<>();
+            assert multiplierSection != null;
             for (String rank : multiplierSection.getKeys(false)) {
                 multipliers.put(rank, multiplierSection.getDouble(rank));
             }
@@ -492,6 +559,7 @@ public class IConfig {
                 List<String> lore = joinItemsSection.getStringList("lore");
                 Map<Enchantment, Integer> enchantments = new HashMap<>();
                 ConfigurationSection nameTagSection = joinItemsSection.getConfigurationSection("nameTag");
+                assert nameTagSection != null;
                 String nameTagName = nameTagSection.getString("nbtTagName");
                 String nameTagValue = nameTagSection.getString("nbtValue");
                 ConfigurationSection enchantmentsConfig = joinItemsSection.getConfigurationSection("enchantments");
@@ -582,7 +650,12 @@ public class IConfig {
                 int uses = customItemSection.getInt("uses");
                 boolean unlimitedUses = customItemSection.getBoolean("unlimitedUses", false);
 
-                if (!unlimitedUses) {
+                /*
+                * Bug fix 10/19/23
+                * Bug: If config section unlimitedUses didn't exist, app would error out
+                * add check for null config section.
+                */
+                if (!unlimitedUses || customItemSection.getConfigurationSection("unlimitedUses") == null) {
                     if (CustomNBTUtil.getStringNBTValue(item, "uses") == null) {
                         CustomNBTUtil.setIntNBTValue(item, "uses", 0);
                     }

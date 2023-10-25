@@ -1,32 +1,20 @@
 package org.cyci.mc.joinevents;
 
 import co.aikar.commands.PaperCommandManager;
-import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.cyci.mc.joinevents.cmd.JoinEventsCMD;
 import org.cyci.mc.joinevents.config.ConfigWrapper;
-import org.cyci.mc.joinevents.config.IConfig;
 import org.cyci.mc.joinevents.config.Lang;
 import org.cyci.mc.joinevents.db.PlayerTimeTracker;
 import org.cyci.mc.joinevents.listeners.InventoryMoveItemEvent;
 import org.cyci.mc.joinevents.listeners.PlayerInteract;
 import org.cyci.mc.joinevents.listeners.PlayerJoin;
 import org.cyci.mc.joinevents.listeners.PlayerLeave;
-import org.cyci.mc.joinevents.manager.ConfigManager;
 import org.cyci.mc.joinevents.manager.ConfigurationManager;
 import org.cyci.mc.joinevents.manager.MySQLManager;
 import org.cyci.mc.joinevents.tasks.PlaytimeUpdaterTask;
-import org.cyci.mc.joinevents.utils.C;
-
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public final class Registry extends JavaPlugin {
@@ -46,7 +34,7 @@ public final class Registry extends JavaPlugin {
         config = new ConfigWrapper(this, "config.yml");
         ConfigurationManager configManager = new ConfigurationManager(this);
         saveDefaultConfig();
-
+        loadMessages();
         String mysqlHost = configManager.getMySQLHost();
         int mysqlPort = configManager.getMySQLPort();
         String mysqlDatabase = configManager.getMySQLDatabase();
@@ -71,8 +59,6 @@ public final class Registry extends JavaPlugin {
                 } finally {
                     getLogger().info("Registered the events");
                 }
-
-                loadMessages();
 
                 int updateInterval = 1200;
                 new PlaytimeUpdaterTask().runTaskTimer(this, 0, updateInterval);

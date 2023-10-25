@@ -38,6 +38,7 @@ public class JoinEventsCMD extends BaseCommand {
 
     @Subcommand("time")
     @Description("Display player's tracked playtime")
+    @CommandCompletion("Player")
     public void onTime(CommandSender sender, @Flags("other") Player target) {
         int playtime = Registry.instance.getPlayerTimeTracker().getPlaytime(target.getUniqueId().toString());
         sender.sendMessage(C.c("&7" + target.getName() + "'s Playtime: &b" + playtime + " &7minutes"));
@@ -45,6 +46,7 @@ public class JoinEventsCMD extends BaseCommand {
 
     @Subcommand("logins")
     @Description("Display player's login count")
+    @CommandCompletion("Player")
     public void onLogins(CommandSender sender, @Flags("other") Player target) {
         int logins = Registry.instance.getPlayerTimeTracker().getLogins(target.getUniqueId().toString());
         sender.sendMessage(C.c("&7" + target.getName() + "'s Logins: &b" + logins));

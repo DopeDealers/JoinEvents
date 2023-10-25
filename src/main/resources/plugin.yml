@@ -3,7 +3,7 @@ main: org.cyci.mc.joinevents.Registry
 version: '${project.version}'
 description: A plugin to do awesome effects and messages upon a player joining
 api-version: '1.20'
-depend: [PlaceholderAPI]
+depend: [PlaceholderAPI, ProtocolLib]
 
 commands:
   je:

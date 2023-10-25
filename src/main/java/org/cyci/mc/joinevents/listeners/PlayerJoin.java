@@ -41,11 +41,11 @@ public class PlayerJoin  implements Listener {
 
         Registry.instance.getPlayerTimeTracker().addPlayerIfNotExists(event.getPlayer());
         Registry.instance.getPlayerTimeTracker().recordLogin(event.getPlayer().getUniqueId().toString());
+    }
 
-        int playtimeMinutes = Registry.instance.getPlayerTimeTracker().getPlaytime(event.getPlayer().getUniqueId().toString());
-        int logins = Registry.instance.getPlayerTimeTracker().getLogins(event.getPlayer().getUniqueId().toString());
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerJoinScoreBoardAndLeaderBoard(PlayerJoinEvent event) {
 
-        event.getPlayer().sendMessage("Welcome back! You have played for " + playtimeMinutes + " minutes over " + logins + " logins.");
     }
 
     /**
@@ -61,13 +61,19 @@ public class PlayerJoin  implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void rankJoins(PlayerJoinEvent e) {
         Player player = e.getPlayer();
-        List<String> rankIds = new ArrayList<>(Registry.instance.config.getConfig().getConfigurationSection("config.ranks").getKeys(false));
-        for (String rankId : rankIds) {
+        ConfigurationSection ranksSection = Registry.instance.config.getConfig().getConfigurationSection("config.ranks");
+
+        if (ranksSection == null) {
+            return;
+        }
+
+        for (String rankId : ranksSection.getKeys(false)) {
             if (config.isRankEnabled(rankId) && config.hasPermission(player, rankId)) {
                 SoundParser soundParser = config.parseNoise(rankId);
                 if (soundParser != null) {
                     player.playSound(player.getLocation(), soundParser.getSound(), soundParser.getVolume(), soundParser.getPitch());
                 }
+
                 new IConfigAsyncTask(Registry.instance, config, player, rankId, "join");
 
                 BossBarParser bossBarParser = config.parseBossBar(rankId);
@@ -81,17 +87,17 @@ public class PlayerJoin  implements Listener {
                 }
 
                 List<FireworkParser> fireworks = config.getFireworks(rankId);
-                for (FireworkParser fireworkParser : fireworks) {
-                    FireworkParser.shootFirework(player.getLocation(), fireworkParser);
-                }
+                fireworks.forEach(fireworkParser -> FireworkParser.shootFirework(player.getLocation(), fireworkParser));
 
                 for (String itemName : config.getJoinItemNames(rankId)) {
-                    ItemStack joinItem = config.parseJoinItem(rankId, itemName);
-                    ConfigurationSection test = Registry.instance.config.getConfig().getConfigurationSection("config.ranks." + rankId + ".joinItems." + itemName);
-                    if (joinItem != null && test != null) {
-                        int slot = test.getInt("slot");
+                    ConfigurationSection joinItemSection = ranksSection.getConfigurationSection(rankId + ".joinItems." + itemName);
+                    if (joinItemSection != null) {
+                        int slot = joinItemSection.getInt("slot");
                         if (slot >= 0 && slot < player.getInventory().getSize()) {
-                            player.getInventory().setItem(slot, joinItem);
+                            ItemStack joinItem = config.parseJoinItem(rankId, itemName);
+                            if (joinItem != null) {
+                                player.getInventory().setItem(slot, joinItem);
+                            }
                         } else {
                             Registry.instance.getLogger().warning("Invalid slot specified for join item: " + itemName);
                         }

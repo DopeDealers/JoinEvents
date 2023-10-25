@@ -15,6 +15,7 @@ import org.cyci.mc.joinevents.utils.CustomNBTUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author - Phil
@@ -52,7 +53,7 @@ public class InventoryMoveItemEvent implements Listener {
                     for (String itemName : customItemNames) {
                         if (itemName != null && !itemName.isEmpty()) {
                             if (config.isCustomItem(item, rankId, itemName, player)) {
-                                if (CustomNBTUtil.getStringNBTValue(item, "unmovable").equals("true")) {
+                                if (!Objects.requireNonNull(CustomNBTUtil.getStringNBTValue(item, "unmovable")).isEmpty()) {
                                     e.setCancelled(true);
                                 }
                             }

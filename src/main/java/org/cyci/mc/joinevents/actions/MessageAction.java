@@ -1,6 +1,7 @@
 package org.cyci.mc.joinevents.actions;
 
 import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.cyci.mc.joinevents.utils.Actions;
 import org.cyci.mc.joinevents.utils.C;
@@ -22,5 +23,10 @@ public class MessageAction implements Actions {
     public void execute(Player player) {
         String finalMessage = PlaceholderAPI.setPlaceholders(player, this.message);
         player.sendMessage(C.c(finalMessage));
+    }
+
+    @Override
+    public void loadFromConfig(ConfigurationSection config) {
+
     }
 }
