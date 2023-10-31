@@ -545,7 +545,6 @@ public class IConfig {
      *
      * @param String rankId Get the rank from the config
      * @param String itemName Get the item from the config
-     * @param Player player Get the player's uuid
      *
      * @return An itemstack
      *

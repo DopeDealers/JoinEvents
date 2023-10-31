@@ -1,5 +1,6 @@
 package org.cyci.mc.joinevents.manager;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
 import org.cyci.mc.joinevents.Registry;
 import org.cyci.mc.joinevents.config.IConfig;
@@ -120,7 +121,7 @@ public class CooldownManager {
             cooldownMessage = cooldownMessage.replace("%h", String.format("%02d", hours));
             cooldownMessage = cooldownMessage.replace("%m", String.format("%02d", minutes));
             cooldownMessage = cooldownMessage.replace("%s", String.format("%02d", seconds));
-            player.sendMessage(C.c(cooldownMessage));
+            player.sendMessage(C.c(PlaceholderAPI.setPlaceholders(player, cooldownMessage)));
         } else {
             Registry.instance.getLogger().info("Cooldown message is null for item: " + customItemName);
             Registry.instance.getLogger().info("Cooldown path is: " + cooldownPath);
