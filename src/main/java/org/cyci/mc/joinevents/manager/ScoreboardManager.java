@@ -22,8 +22,7 @@ import java.util.List;
  */
 public class ScoreboardManager {
 
-    IConfig config = new ConfigManager(Registry.instance).getConfig("config.yml", Registry.instance.getConfig());
-
+    IConfig config = new ConfigManager(Registry.instance).getConfig("config.yml", Registry.instance.config.getConfig());
     private org.bukkit.scoreboard.ScoreboardManager scoreboardManager;
     private Scoreboard scoreboard;
     private Objective objective;

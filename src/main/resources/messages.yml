@@ -1,0 +1,7 @@
+messages:
+  prefix: "&a&lJoinEvents &7>"
+  noperm: "{prefix} &7You do not have the &c{permission} &7permission"
+  reload: "{prefix} &aReloaded the config."
+  no_arg: "{prefix} &cNot enough args."
+  time: "{prefix} &7%player_displayname%'s time is &b{time}&7 minutes"
+  logins: "{prefix} &7%player_displayname% has &b{logins}&7 logins"

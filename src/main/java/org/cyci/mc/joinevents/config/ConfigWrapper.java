@@ -16,6 +16,8 @@ public class ConfigWrapper {
     private File configFile;
     private FileConfiguration config;
 
+    private long lastModified = 0;
+
     public ConfigWrapper(Plugin plugin, String fileName) {
         this.plugin = plugin;
         this.fileName = fileName;
@@ -32,14 +34,28 @@ public class ConfigWrapper {
 
     public void loadConfig(String header) {
         if (config == null) {
-            reloadConfig();
+            reload();
         }
-        config.options().header(header);
+        config.options().getHeader().add(header);
         config.options().copyDefaults(true);
         saveConfig();
     }
 
+    public void updateCachedConfig() {
+        if (configFile != null) {
+            config = YamlConfiguration.loadConfiguration(configFile);
+        }
+    }
+
     public void reloadConfig() {
+        updateCachedConfig();
+        final InputStream defConfigStream = plugin.getResource(fileName);
+        if (defConfigStream != null) {
+            config.setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(defConfigStream, StandardCharsets.UTF_8)));
+        }
+    }
+
+    public void reload() {
         config = YamlConfiguration.loadConfiguration(configFile);
         final InputStream defConfigStream = plugin.getResource(fileName);
         if (defConfigStream != null) {
@@ -49,7 +65,7 @@ public class ConfigWrapper {
 
     public FileConfiguration getConfig() {
         if (config == null) {
-            reloadConfig();
+            reload();
         }
         return config;
     }

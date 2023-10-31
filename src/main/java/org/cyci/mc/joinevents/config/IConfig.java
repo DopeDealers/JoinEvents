@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
  * @created Sun - 20/Aug/2023 - 11:14 PM
  */
 public class IConfig {
-    private final FileConfiguration file;
+    private static FileConfiguration file;
     private final String configName;
 
     /**
@@ -577,11 +577,10 @@ public class IConfig {
                 ItemStack itemStack = new ItemStack(material);
                 ItemMeta itemMeta = itemStack.getItemMeta();
                 itemMeta.displayName(C.c(name));
-                @Nullable List<Component> loreList = itemMeta.lore();
-                if (loreList == null) {
-                    loreList = new ArrayList<>();
+                List<Component> loreList = new ArrayList<>();
+                for (String loreLine : lore) {
+                    loreList.add(C.c(loreLine));
                 }
-                loreList.addAll(C.c(lore.toString()).children());
                 itemMeta.lore(loreList);
                 itemStack.addUnsafeEnchantments(enchantments);
 
@@ -676,5 +675,8 @@ public class IConfig {
         }
 
         return false;
+    }
+    public static void setFile(FileConfiguration config) {
+        file = config;
     }
 }

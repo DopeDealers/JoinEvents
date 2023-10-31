@@ -1,4 +1,4 @@
-package org.cyci.mc.joinevents.utils;
+package org.cyci.mc.joinevents.parsers;
 
 /**
  * @project - JoinEvents

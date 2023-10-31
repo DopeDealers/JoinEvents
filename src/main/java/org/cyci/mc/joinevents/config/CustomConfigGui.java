@@ -23,8 +23,7 @@ import java.util.List;
  */
 public class CustomConfigGui {
 
-    IConfig config = new ConfigManager(Registry.instance).getConfig("config.yml", Registry.instance.getConfig());
-
+    IConfig config = new ConfigManager(Registry.instance).getConfig("config.yml", Registry.instance.config.getConfig());
 
     /**
      * The openRankEditor function opens a GUI for the player to edit ranks.

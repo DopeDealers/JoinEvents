@@ -34,8 +34,17 @@ import java.util.List;
  */
 public class PlayerJoin  implements Listener {
 
-    IConfig config = new ConfigManager(Registry.instance).getConfig("config.yml", Registry.instance.getConfig());
+    IConfig config = new ConfigManager(Registry.instance).getConfig("config.yml", Registry.instance.config.getConfig());
+    /**
+     * The onPlayerJoinTimeAndJoinTrackers function is called when a player joins the server.
+     * It adds the player to the PlayerTimeTracker if they are not already in it, and records their login time.
 
+     *
+     * @param PlayerJoinEvent event Get the player that joined
+     *
+     * @return Nothing
+     *
+     */
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoinTimeAndJoinTrackers(PlayerJoinEvent event) {
 

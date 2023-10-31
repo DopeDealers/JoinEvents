@@ -32,8 +32,8 @@ config:
       title:
       subtitle:
       foreverBar:
-    display: -|
-      Sex
+    display:
+      - "temp"
   leaderboard: # for top logins and top time played
     x: 100.0
     y: 70.0

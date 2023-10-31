@@ -204,17 +204,5 @@
             <artifactId>snakeyaml</artifactId>
             <version>1.33</version>
         </dependency>
-        <dependency>
-            <groupId>me.filoghost.holographicdisplays</groupId>
-            <artifactId>holographicdisplays-api</artifactId>
-            <version>3.0.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.comphenix.protocol</groupId>
-            <artifactId>ProtocolLib</artifactId>
-            <version>4.5.0</version>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 </project>

@@ -15,6 +15,8 @@ public class HealAction implements Actions {
     @Override
     public void execute(Player player) {
         player.setHealth(20);
+        player.setFireTicks(0);
+        player.setFoodLevel(20);
     }
 
     @Override

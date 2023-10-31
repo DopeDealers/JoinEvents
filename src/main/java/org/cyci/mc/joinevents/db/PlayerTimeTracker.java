@@ -1,16 +1,13 @@
 package org.cyci.mc.joinevents.db;
 
 import com.zaxxer.hikari.HikariDataSource;
-import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
-import me.filoghost.holographicdisplays.api.hologram.Hologram;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.cyci.mc.joinevents.Registry;
 import org.cyci.mc.joinevents.config.IConfig;
 import org.cyci.mc.joinevents.manager.ConfigManager;
-import org.cyci.mc.joinevents.manager.MySQLManager;
-import org.cyci.mc.joinevents.utils.PlayerData;
+import org.cyci.mc.joinevents.parsers.PlayerData;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,7 +15,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * @project - JoinEvents
@@ -30,8 +26,7 @@ import java.util.Locale;
 public class PlayerTimeTracker {
     private final HikariDataSource dataSource;
     private List<PlayerData> topPlayers = new ArrayList<>();
-    IConfig config = new ConfigManager(Registry.instance).getConfig("config.yml", Registry.instance.getConfig());
-
+    IConfig config = new ConfigManager(Registry.instance).getConfig("config.yml", Registry.instance.config.getConfig());
 
     public PlayerTimeTracker(HikariDataSource dataSource) {
         this.dataSource = dataSource;
@@ -128,13 +123,14 @@ public class PlayerTimeTracker {
     public void displayPlaytimeLeaderboard(int numPlayers) {
         List<PlayerData> topPlayers = getTopPlayers(numPlayers);
         Location scoreboardLocation = config.getLocation("config.leaderboard.location");
-        Hologram hologram = (Hologram) HolographicDisplaysAPI.get(Registry.instance).createHologram(scoreboardLocation);
+        // ruling this out for my own manager
+        //Hologram hologram = (Hologram) HolographicDisplaysAPI.get(Registry.instance).createHologram(scoreboardLocation);
 
         assert topPlayers != null;
         if (topPlayers.isEmpty()) {
-            hologram.getLines().insertText(0, "Leaderboard is empty.");
+            //hologram.getLines().insertText(0, "Leaderboard is empty.");
         } else {
-            hologram.getLines().insertText(0, "Playtime Leaderboard:");
+            //hologram.getLines().insertText(0, "Playtime Leaderboard:");
 
             for (int i = 0; i < topPlayers.size(); i++) {
                 PlayerData player = topPlayers.get(i);
@@ -143,7 +139,7 @@ public class PlayerTimeTracker {
                 assert playerActual != null;
                 String playerName = playerActual.getName();
                 int rank = i + 1;
-                hologram.getLines().insertText(rank, "#" + rank + ": " + playerName + " - " + playtime + " minutes");
+                //hologram.getLines().insertText(rank, "#" + rank + ": " + playerName + " - " + playtime + " minutes");
             }
         }
     }

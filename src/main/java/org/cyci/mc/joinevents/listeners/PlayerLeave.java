@@ -26,8 +26,7 @@ import java.util.List;
  */
 public class PlayerLeave implements Listener {
 
-    IConfig config = new ConfigManager(Registry.instance).getConfig("config.yml", Registry.instance.getConfig());
-    /**
+    IConfig config = new ConfigManager(Registry.instance).getConfig("config.yml", Registry.instance.config.getConfig());    /**
      * The rankJoins function is called when a player leaves the server.
      * It checks if the player has any ranks that have join items enabled, and removes them from their inventory.
 

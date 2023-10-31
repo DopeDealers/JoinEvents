@@ -29,7 +29,7 @@ import java.util.List;
  */
 public class PlayerInteract implements Listener {
 
-    IConfig config = new ConfigManager(Registry.instance).getConfig("config.yml", Registry.instance.getConfig());
+    IConfig config = new ConfigManager(Registry.instance).getConfig("config.yml", Registry.instance.config.getConfig());
     CooldownManager cooldownManager = new CooldownManager();
 
     /**

@@ -99,7 +99,7 @@ public final class Registry extends JavaPlugin {
                     return null;
                 });
     }
-    private void loadMessages() {
+    public void loadMessages() {
         Lang.setFile(this.messagesFile.getConfig());
         for (Lang value : Lang.values())
             this.messagesFile.getConfig().addDefault(value.getPath(), value.getDefault());

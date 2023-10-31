@@ -14,8 +14,7 @@ import org.cyci.mc.joinevents.manager.ConfigManager;
  */
 public class ConfigurationManager {
     private final Registry plugin;
-    IConfig config = new ConfigManager(Registry.instance).getConfig("config.yml", Registry.instance.getConfig());
-
+    IConfig config = new ConfigManager(Registry.instance).getConfig("config.yml", Registry.instance.config.getConfig());
     public ConfigurationManager(Registry plugin) {
         this.plugin = plugin;
     }

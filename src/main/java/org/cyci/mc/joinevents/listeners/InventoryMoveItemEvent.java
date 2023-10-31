@@ -26,8 +26,7 @@ import java.util.Objects;
  */
 public class InventoryMoveItemEvent implements Listener {
 
-    IConfig config = new ConfigManager(Registry.instance).getConfig("config.yml", Registry.instance.getConfig());
-
+    IConfig config = new ConfigManager(Registry.instance).getConfig("config.yml", Registry.instance.config.getConfig());
     /**
      * The onItemMove function is an event handler that prevents players from moving items in their inventory.
      * This function is called whenever a player clicks on an item in their inventory, and it checks to see if the item
